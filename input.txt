@@ -1,0 +1,86 @@
+CUBE STATE
+===========
+
+26 cubies with colors arranged in groups as below
+colors can be any symbols - typically the 6 face colors and
+you can use a wildcard color for don't care configs
+
+
+    U
+UFL UF UFR UR UBR UB UBL UL
+FL  F  FR  R  BR  B  BL  L
+DFL DF DFR DR DBR DB DBL DL
+    D
+
+
+
+PROBLEM INPUT
+==============
+
+problems are input as a text file with instructions as explained below. 
+  * note that only the 'pop' command removes cubes from the cube stack
+
+push <cube>
+  put given cube config on stack
+
+pop
+  removes top of stack
+
+twist <list of turns whitespace separated and terminated by EOL>
+  make given moves on top of stack
+
+print
+  print top of stack to stdio
+
+dup
+  duplicates cube on top of stack
+
+solve <depth>
+  start with cube on top of stack and print all the combinations that reaches second to top 
+   of stack within <depth> moves
+
+set <parameter> to <value>
+  set a config parameter to a specific value
+  
+  set halfturn <on | off>
+    enable half turns (F2, L2, etc)
+ 
+  set medianturn <on | off>
+    enable median turns (M, E, S)
+
+  set wideturn <on | off>
+    enable double wide turns (Fw, Uw, etc)
+
+  set cuberotation <on | off>
+    enable rotation of entire cube (X, Y, Z)
+
+  set xptable <size in MB>
+    hash table size for transposition elimination - bigger is better
+      but you dont want to spill to disk, so pick a number like 0.5 - 0.75 of RAM
+
+  set threads <number>
+    set number of parallel threads to search for solutions
+
+
+reset
+  resets all parameters to their defaults
+    halfturn on
+    medianturn off
+    wideturn off
+    cuberotation off
+    xptable 1024
+    threads (number of physical cores on platform)
+
+end
+  terminate program
+
+
+example program:
+
+push U UFL UF UFR UR UBR UB UBL UL FL F FR R BR B BL L DFL DF DFR DR DBR DB DBL DL D
+dup
+turn F L
+solve 2
+end
+
+
