@@ -1,6 +1,9 @@
 #ifndef GO_BASE_H
 #define GO_BASE_H
 
+#include <assert.h>
+#include <stdio.h>
+
 #include <iostream>
 #include <vector>
 #include <map>
@@ -11,7 +14,8 @@ using namespace std;
 
 #define PACKED __attribute__((packed))
 
-typedef unsigned char byte;
-typedef unsigned short word;
+typedef uint8_t byte;
+typedef uint16_t word;
+typedef uint64_t qword;
 
 #endif //GO_BASE_H

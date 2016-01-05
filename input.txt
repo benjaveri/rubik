@@ -1,16 +1,22 @@
 CUBE STATE
 ===========
 
-26 cubies with colors arranged in groups as below
-colors can be any symbols - typically the 6 face colors and
-you can use a wildcard color for don't care configs
+you have two options:
 
+1. 26 cubies with colors arranged in groups as below
+    colors can be any symbols - typically the 6 face colors and
+    you can use a wildcard color for don't care configs
 
-    U
-UFL UF UFR UR UBR UB UBL UL
-FL  F  FR  R  BR  B  BL  L
-DFL DF DFR DR DBR DB DBL DL
-    D
+        U
+    UFL UF UFR UR UBR UB UBL UL
+    FL  F  FR  R  BR  B  BL  L
+    DFL DF DFR DR DBR DB DBL DL
+        D
+
+2. 6 faces with 3x3 colors in succession, reading top->bottom, 
+    left to right when facing you
+
+    UUUUUUUUU FFFFFFFFF RRRRRRRRR BBBBBBBBB LLLLLLLLL DDDDDDDDD
 
 
 
@@ -21,7 +27,7 @@ problems are input as a text file with instructions as explained below.
   * note that only the 'pop' command removes cubes from the cube stack
 
 push <cube>
-  put given cube config on stack
+  put given cube config on stack. autodetects 26 cubie or 6 face format
 
 pop
   removes top of stack
@@ -29,8 +35,8 @@ pop
 twist <list of turns whitespace separated and terminated by EOL>
   make given moves on top of stack
 
-print
-  print top of stack to stdio
+print (cubies|faces)
+  print top of stack to stdio in given format
 
 dup
   duplicates cube on top of stack

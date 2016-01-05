@@ -22,13 +22,23 @@ enum class Turn {
     Uw, Uw2, Uwp, Dw, Dw2, Dwp,
     Lw, Lw2, Lwp, Rw, Rw2, Rwp,
     Fw, Fw2, Fwp, Bw, Bw2, Bwp,
-    TOTAL
+    TOTAL, NONE
 };
 
 typedef vector<Turn> TurnList;
 
 
 class Cube {
+    //
+    // string <-> enum mappings
+    //
+public:
+    static map<string,Turn> turnMap;
+//    static map<string,Face> faceMap;
+//    static map<string,Cubie> cubieMap;
+
+    inline static Turn lookupTurn(string s) { auto it = turnMap.find(s); return (it == turnMap.end()) ? Turn::NONE : it->second; }
+
     //
     // state
     //
@@ -37,6 +47,7 @@ public:
     byte edge[12];  // UF UR UB UL FL FR RB BL DF DR DB DL each 4:4 bits
     word corner[8]; // UFL UFR UBR UBL DFL DFR DBR DBL each 4:4:4 bits
 
+    qword computeHash() const;
 
     //
     // turns (cube_turn.cpp)
@@ -45,36 +56,35 @@ protected:
     static const int cubeDefPgm[][2];
     static const char *seed[];
     static const char *combinations[];
-    static const char *turnNames[(int)Turn::TOTAL];
+    static const char *turnName[(int)Turn::TOTAL];
 
-public:
-    static map<string,Turn> turnMap;
-    static map<string,Face> faceMap;
-    static map<string,Cubie> cubieMap;
-
-
-public:
-    struct twist_t {
-        byte faceShuffle[6];
-        byte edgeMove[12];
-        byte edgeShuffle[12];
-        byte cornerMove[8];
-        byte cornerShuffle[8];
+    struct Twist {
+        byte faceShuffle[6];    // 0:4 bits rotate:shuffle
+        byte edgeShuffle[12];   // 1:4 bits rotate:shuffle
+        byte cornerShuffle[8];  // 2:4 bits rotate:shuffle
     } PACKED;
+    static Twist twist[(int)Turn::TOTAL];
 
-protected:
-    static twist_t twist[(int)Turn::TOTAL];
+    static byte edgeRotation(byte org,int rot);
+    static word cornerRotation(word org,int rot);
+
+private:
+    static void computeTwist(const Cube& r,const Cube& c,Twist & t);
 
 public:
     static void generateTables();
+    void apply(Turn turn,Cube& dest) const;
 
+    //
+    // parsing (cube_parser.cpp)
+    //
 public:
     int parseCubies(const string& def,map<char,byte>& key); // -1 for success, else cubie # where error is
     static bool parseKey(const string& def,map<char,byte>& key);
-
-public:
-    void apply(Turn turn,Cube& dest);
-
 } PACKED;
+
+inline bool operator==(const Cube& lhs,const Cube& rhs) {
+    return !memcmp(&lhs,&rhs,sizeof(Cube));
+}
 
 #endif //GO_CUBE_H
