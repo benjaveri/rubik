@@ -33,7 +33,7 @@ push <cube>
 pop
   removes top of stack
 
-twist <list of turns whitespace separated and terminated by EOL>
+(twist|turn) <list of turns whitespace separated and terminated by EOL>
   make given moves on top of stack
 
 print [cubies]
