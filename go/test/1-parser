@@ -1,0 +1,17 @@
+# solved cube expressed as faces
+push UUUUUUUUU FFFFFFFFF RRRRRRRRR BBBBBBBBB LLLLLLLLL DDDDDDDDD
+print faces
+print cubies
+pop
+
+# solved cube expressed as cubies
+push U UFL UF UFR UR UBR UB UBL UL FL F FR R BR B BL L DFL DF DFR DR DBR DB DBL DL D
+print faces
+print cubies
+pop
+
+# cube with wildcards
+push UxyUUUUUU FFFxFFFyF RRRRyRRRR BxBxBBxBB LyLyLyLyL DDDDDDDDD
+print faces
+print cubies
+pop

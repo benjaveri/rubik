@@ -5,8 +5,10 @@
 #include <stdio.h>
 
 #include <iostream>
+#include <fstream>
 #include <vector>
 #include <map>
+#include <stack>
 #include <string>
 #include <sstream>
 

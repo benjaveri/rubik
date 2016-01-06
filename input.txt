@@ -23,7 +23,8 @@ you have two options:
 PROBLEM INPUT
 ==============
 
-problems are input as a text file with instructions as explained below. 
+problems are specified as text files on command line with instructions as 
+  explained below. 
   * note that only the 'pop' command removes cubes from the cube stack
 
 push <cube>
@@ -35,8 +36,8 @@ pop
 twist <list of turns whitespace separated and terminated by EOL>
   make given moves on top of stack
 
-print (cubies|faces)
-  print top of stack to stdio in given format
+print [cubies]
+  print top of stack to stdio in faces format unless otherwise specified
 
 dup
   duplicates cube on top of stack

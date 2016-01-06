@@ -1,0 +1,177 @@
+# U
+push RRRRRRRRR YYYYYYYYY BBBBBBBBB WWWWWWWWW GGGGGGGGG OOOOOOOOO
+turn U
+print faces
+turn U2
+print faces
+turn U'
+print faces
+
+# E
+push RRRRRRRRR YYYYYYYYY BBBBBBBBB WWWWWWWWW GGGGGGGGG OOOOOOOOO
+turn E
+print faces
+turn E2
+print faces
+turn E'
+print faces
+pop
+
+# D
+push RRRRRRRRR YYYYYYYYY BBBBBBBBB WWWWWWWWW GGGGGGGGG OOOOOOOOO
+turn D
+print faces
+turn D2
+print faces
+turn D'
+print faces
+pop
+
+# L
+push RRRRRRRRR YYYYYYYYY BBBBBBBBB WWWWWWWWW GGGGGGGGG OOOOOOOOO
+turn L
+print faces
+turn L2
+print faces
+turn L'
+print faces
+pop
+
+# M
+push RRRRRRRRR YYYYYYYYY BBBBBBBBB WWWWWWWWW GGGGGGGGG OOOOOOOOO
+turn M
+print faces
+turn M2
+print faces
+turn M'
+print faces
+pop
+
+# R
+push RRRRRRRRR YYYYYYYYY BBBBBBBBB WWWWWWWWW GGGGGGGGG OOOOOOOOO
+turn R
+print faces
+turn R2
+print faces
+turn R'
+print faces
+pop
+
+# F
+push RRRRRRRRR YYYYYYYYY BBBBBBBBB WWWWWWWWW GGGGGGGGG OOOOOOOOO
+turn F
+print faces
+turn F2
+print faces
+turn F'
+print faces
+pop
+
+# S
+push RRRRRRRRR YYYYYYYYY BBBBBBBBB WWWWWWWWW GGGGGGGGG OOOOOOOOO
+turn S
+print faces
+turn S2
+print faces
+turn S'
+print faces
+pop
+
+# B
+push RRRRRRRRR YYYYYYYYY BBBBBBBBB WWWWWWWWW GGGGGGGGG OOOOOOOOO
+turn B
+print faces
+turn B2
+print faces
+turn B'
+print faces
+pop
+
+# X
+push RRRRRRRRR YYYYYYYYY BBBBBBBBB WWWWWWWWW GGGGGGGGG OOOOOOOOO
+turn X
+print faces
+turn X2
+print faces
+turn X'
+print faces
+pop
+
+# Y
+push RRRRRRRRR YYYYYYYYY BBBBBBBBB WWWWWWWWW GGGGGGGGG OOOOOOOOO
+turn Y
+print faces
+turn Y2
+print faces
+turn Y'
+print faces
+pop
+
+# Z
+push RRRRRRRRR YYYYYYYYY BBBBBBBBB WWWWWWWWW GGGGGGGGG OOOOOOOOO
+turn Z
+print faces
+turn Z2
+print faces
+turn Z'
+print faces
+pop
+
+# Uw
+push RRRRRRRRR YYYYYYYYY BBBBBBBBB WWWWWWWWW GGGGGGGGG OOOOOOOOO
+turn Uw
+print faces
+turn Uw2
+print faces
+turn Uw'
+print faces
+
+# Dw
+push RRRRRRRRR YYYYYYYYY BBBBBBBBB WWWWWWWWW GGGGGGGGG OOOOOOOOO
+turn Dw
+print faces
+turn Dw2
+print faces
+turn Dw'
+print faces
+pop
+
+# Lw
+push RRRRRRRRR YYYYYYYYY BBBBBBBBB WWWWWWWWW GGGGGGGGG OOOOOOOOO
+turn Lw
+print faces
+turn Lw2
+print faces
+turn Lw'
+print faces
+pop
+
+# Rw
+push RRRRRRRRR YYYYYYYYY BBBBBBBBB WWWWWWWWW GGGGGGGGG OOOOOOOOO
+turn Rw
+print faces
+turn Rw2
+print faces
+turn Rw'
+print faces
+pop
+
+# Fw
+push RRRRRRRRR YYYYYYYYY BBBBBBBBB WWWWWWWWW GGGGGGGGG OOOOOOOOO
+turn Fw
+print faces
+turn Fw2
+print faces
+turn Fw'
+print faces
+pop
+
+# Bw
+push RRRRRRRRR YYYYYYYYY BBBBBBBBB WWWWWWWWW GGGGGGGGG OOOOOOOOO
+turn Bw
+print faces
+turn Bw2
+print faces
+turn Bw'
+print faces
+pop

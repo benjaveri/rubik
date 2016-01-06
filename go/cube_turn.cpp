@@ -1,8 +1,17 @@
 #include "cube.h"
 
-map<string,Turn> Cube::turnMap;
-//map<string,Face> Cube::faceMap;
-//map<string,Cubie> Cube::cubieMap;
+
+const char *Cube::lutTurnName[(int)Turn::TOTAL] = {
+    "U", "U2", "U'", "E", "E2", "E'", "D", "D2", "D'",
+    "L", "L2", "L'", "M", "M2", "M'", "R", "R2", "R'",
+    "F", "F2", "F'", "S", "S2", "S'", "B", "B2", "B'",
+    "X", "X2", "X'", "Y", "Y2", "Y'", "Z", "Z2", "Z'",
+    "Uw", "Uw2", "Uw'", "Dw", "Dw2", "Dw'",
+    "Lw", "Lw2", "Lw'", "Rw", "Rw2", "Rw'",
+    "Fw", "Fw2", "Fw'", "Bw", "Bw2", "Bw'",
+};
+
+map<string,Turn> Cube::lutTurnMap;
 
 /*
     U
@@ -13,44 +22,24 @@ map<string,Turn> Cube::turnMap;
 */
 
 // a few basic turns from which we can compose all turns
-const char *Cube::seed[] = {
-    // reference
-    "R "
-    "RYG RY RYB RB RWB RW RWG RG "
-    "YG  Y  YB  B  WB  W  WG  G "
-    "OYG OY OYB OB OWB OW OWG OG "
-    "O",
-    // U
-    "R "
-    "RBY RB RBW RW RGW RG RGY RY "
-    "YG  Y  YB  B  WB  W  WG  G "
-    "OYG OY OYB OB OWB OW OWG OG "
-    "O",
-    // E
-    "R "
-    "RBY RB RBW RW RGW RG RGY RY "
-    "GW  G  GY  Y  BY  B  BW  W "
-    "OYG OY OYB OB OWB OW OWG OG "
-    "O",
-    // X
-    "Y "
-    "YOG YO YOB YB YRB YR YRG YG "
-    "OG  O  OB  B  RB  R  RG  G "
-    "WOG WO WOB WB WRB WR WRG WG "
-    "W",
-    // Y
-    "R "
-    "RBY RB RBW RW RGW RG RBY RY "
-    "BY  B  BW  W  GW  G  GY  Y "
-    "OBY OB OBW OW OGW OG OGY OY "
-    "O",
+const char *Cube::lutSeedCube[] = {
+        // reference
+        "RRRRRRRRR YYYYYYYYY BBBBBBBBB WWWWWWWWW GGGGGGGGG OOOOOOOOO",
+        // U
+        "RRRRRRRRR BBBYYYYYY WWWBBBBBB GGGWWWWWW YYYGGGGGG OOOOOOOOO",
+        // E
+        "RRRRRRRRR YYYGGGYYY BBBYYYBBB WWWBBBWWW GGGWWWGGG OOOOOOOOO",
+        // X
+        "YYYYYYYYY OOOOOOOOO BBBBBBBBB RRRRRRRRR GGGGGGGGG WWWWWWWWW",
+        // Y
+        "RRRRRRRRR BBBBBBBBB WWWWWWWWW GGGGGGGGG YYYYYYYYY OOOOOOOOO",
     // done
     NULL
 };
 
 // express all turns in terms of U, E, X and Y. allow new definitions to be used
 //  right away
-const char *Cube::combinations[] = {
+const char *Cube::lutTurnDef[] = {
     // U, U2, U'
     "U->U", "U2->U U", "U'->U2 U",
     // E, E2, E'
@@ -91,17 +80,8 @@ const char *Cube::combinations[] = {
     NULL
 };
 
-const char *Cube::turnName[(int)Turn::TOTAL] = {
-    "U", "U2", "U'", "E", "E2", "E'", "D", "D2", "D'",
-    "L", "L2", "L'", "M", "M2", "M'", "R", "R2", "R'",
-    "F", "F2", "F'", "S", "S2", "S'", "B", "B2", "B'",
-    "X", "X2", "X'", "Y", "Y2", "Y'", "Z", "Z2", "Z'",
-    "Uw", "Uw2", "Uw'", "Dw", "Dw2", "Dw'",
-    "Lw", "Lw2", "Lw'", "Rw", "Rw2", "Rw'",
-    "Fw", "Fw2", "Fw'", "Bw", "Bw2", "Bw'",
-};
 
-Cube::Twist Cube::twist[(int)Turn::TOTAL];
+Cube::Twist Cube::lutTwist[(int)Turn::TOTAL];
 
 byte Cube::edgeRotation(byte org,int rot) {
     return rot ? ((org >> 4) | (org << 4)) : org;
@@ -162,13 +142,13 @@ void Cube::computeTwist(const Cube& r,const Cube& c,Cube::Twist &t) {
 
 void Cube::generateTables() {
     // initialize turn map
-    for (int i = 0; i < (int)Turn::TOTAL; i++) turnMap[string(turnName[i])] = (Turn)i;
+    for (int i = 0; i < (int)Turn::TOTAL; i++) lutTurnMap[string(lutTurnName[i])] = (Turn)i;
 
     // parse seed cubes
     Cube seedCube[5];
-    map<char,byte> key;
-    for (int i = 0; i < 5; i++) parseKey(seed[i],key);
-    for (int i = 0; i < 5; i++) seedCube[i].parseCubies(seed[i],key);
+    Key key;
+    for (int i = 0; i < 5; i++) parseKey(lutSeedCube[i],key);
+    for (int i = 0; i < 5; i++) seedCube[i].parseFaces(lutSeedCube[i],key);
 
     // use deltas between ref and seed to determine twist algorithm for initial turns
     const Turn turn[] = { Turn::NONE, Turn::U, Turn::E, Turn::X, Turn::Y };
@@ -176,7 +156,7 @@ void Cube::generateTables() {
     for (int i = 1; i < 5; i++) {
         // operate on these elements
         const Cube& c = seedCube[i];
-        Twist & t = twist[(int)turn[i]];
+        Twist & t = lutTwist[(int)turn[i]];
 
         // determine shuffle
         computeTwist(r,c,t);
@@ -188,7 +168,7 @@ void Cube::generateTables() {
     }
 
     // now compose remaining turns based on table definitions
-    for (const char **combo = combinations; *combo; combo++) {
+    for (const char **combo = lutTurnDef; *combo; combo++) {
         // parse combination
         string s = string(*combo);
         string st = s.substr(0,s.find("->"));
@@ -210,7 +190,7 @@ void Cube::generateTables() {
         }
 
         // determine shuffle
-        computeTwist(r,c,twist[(int) td]);
+        computeTwist(r,c,lutTwist[(int) td]);
 
         // validate correctness
         Cube temp;
@@ -220,7 +200,7 @@ void Cube::generateTables() {
 }
 
 void Cube::apply(Turn turn,Cube& dest) const {
-    Twist & t = twist[(int)turn];
+    Twist & t = lutTwist[(int)turn];
 
     // faces
     for (int i = 0; i < 6; i++) dest.face[i] = face[t.faceShuffle[i]];
