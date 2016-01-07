@@ -1,20 +1,20 @@
 /*
     Copyright (c) 2016, Ben de Waal
     All rights reserved.
-    
+
     Redistribution and use in source and binary forms, with or without
     modification, are permitted provided that the following conditions are met:
-    
+
     * Redistributions of source code must retain the above copyright notice, this
       list of conditions and the following disclaimer.
-    
+
     * Redistributions in binary form must reproduce the above copyright notice,
       this list of conditions and the following disclaimer in the documentation
       and/or other materials provided with the distribution.
-    
-    * The names of the contributors may not be used to endorse or promote products 
+
+    * The names of the contributors may not be used to endorse or promote products
       derived from this software without specific prior written permission.
-    
+
     THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
     AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
     IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -27,6 +27,7 @@
     OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 #include "command.h"
+#include "env.h"
 
 inline bool match(const vector<string>& term,int index,string value) {
     return (term.size() > index) && (term[index] == value);
@@ -58,6 +59,18 @@ struct CatchAll : public Command {
         }
     }
 } catchAll;
+
+/*
+ * DUP
+ */
+struct Duplicate : public Command {
+    Status operator()(const vector<string>& term) {
+        if (!match(term,0,"dup")) return Status::NoMatch;
+        if (!ensure(1)) return Status::Failed;
+        cstack.push(cstack.top());
+        return Status::Success;
+    }
+} duplicate;
 
 /*
  * POP
@@ -122,6 +135,80 @@ struct Push : public Command {
 } push;
 
 /*
+ * RESET
+ */
+struct Reset : public Command {
+    Status operator()(const vector<string>& term) {
+        if (!match(term,0,"reset")) return Status::NoMatch;
+        env.reset();
+        return Status::Success;
+    }
+} reset;
+
+/*
+ * SET
+ */
+struct Set : public Command {
+    Status operator()(const vector<string>& term) {
+        if (!match(term,0,"set")) return Status::NoMatch;
+        if (term.size() < 3) {
+            cout << "Insufficient number of arguments\n";
+            return Status::Failed;
+        }
+        if (match(term,1,"halfturn")) {
+            env.halfTurn = match(term,2,"on");
+        } else if (match(term,1,"medianturn")) {
+            env.medianTurn = match(term,2,"on");
+        } else if (match(term,1,"wideturn")) {
+            env.wideTurn = match(term,2,"on");
+        } else if (match(term,1,"cuberotation")) {
+            env.cubeRotation = match(term,2,"on");
+        } else if (match(term,1,"showduration")) {
+            env.showDuration = match(term,2,"on");
+        } else if (match(term,1,"xptable")) {
+            stringstream ss(term[2]);
+            ss >> env.xpTable;
+        } else if (match(term,1,"threads")) {
+            stringstream ss(term[2]);
+            ss >> env.threads;
+        } else {
+            cout << "Unknown setting\n";
+            return Status::Failed;
+        }
+
+        // done
+        return Status::Success;
+    }
+} set;
+
+/*
+ * SOLVE
+ */
+struct Solve : public Command {
+    Status operator()(const vector<string>& term) {
+        if (!match(term,0,"solve")) return Status::NoMatch;
+        if (!ensure(2)) return Status::Failed;
+
+        // get start and finish cubes off stack
+        Element st0,st1;
+        st0 = cstack.top(); cstack.pop();
+        st1 = cstack.top(); cstack.pop();
+        cstack.push(st1);
+        cstack.push(st0);
+
+        // solve
+        auto t0 = chrono::steady_clock::now();
+        bool rv = Cube::solve(st0.cube,st1.cube);
+        auto t1 = chrono::steady_clock::now();
+        if (env.showDuration) {
+            cout << "Elapsed time: " << chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count() << "ms\n";
+        }
+
+        return rv ? Status::Success : Status::Failed;
+    }
+} solve;
+
+/*
  * TURN|TWIST
  */
 struct Twist : public Command {
@@ -154,9 +241,13 @@ struct Twist : public Command {
  * command list
  */
 Command *command[] = {
+    &duplicate,
     &pop,
     &print,
     &push,
+    &reset,
+    &set,
+    &solve,
     &twist,
     &catchAll
 };

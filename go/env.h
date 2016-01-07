@@ -26,29 +26,25 @@
     OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
     OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+#ifndef GO_ENV_H
+#define GO_ENV_H
 
-#ifndef GO_BASE_H
-#define GO_BASE_H
+#include "base.h"
 
-#include <assert.h>
-#include <stdio.h>
+struct Environment {
+    bool halfTurn, medianTurn, wideTurn, cubeRotation, showDuration;
+    int xpTable,threads;
 
-#include <iostream>
-#include <fstream>
-#include <vector>
-#include <map>
-#include <stack>
-#include <string>
-#include <sstream>
-#include <thread>
-#include <chrono>
+    Environment() { reset(); }
 
-using namespace std;
+    void reset() {
+        halfTurn = showDuration = true;
+        medianTurn = wideTurn = cubeRotation = false;
+        xpTable = 1024;
+        threads = thread::hardware_concurrency();
+    }
+};
 
-#define PACKED __attribute__((packed))
+extern Environment env;
 
-typedef uint8_t byte;
-typedef uint16_t word;
-typedef uint64_t qword;
-
-#endif //GO_BASE_H
+#endif //GO_ENV_H

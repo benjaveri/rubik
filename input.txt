@@ -68,6 +68,9 @@ set <parameter> to <value>
   set threads <number>
     set number of parallel threads to search for solutions
 
+  set showduration <on | off>
+    toggles timing of solve command - useful for benchmarking but not for automated tests
+      relying on diff
 
 reset
   resets all parameters to their defaults
@@ -77,10 +80,8 @@ reset
     cuberotation off
     xptable 1024
     threads (number of physical cores on platform)
-
-end
-  terminate program
-
+    showduration on
+    
 
 example program:
 
@@ -88,6 +89,5 @@ push U UFL UF UFR UR UBR UB UBL UL FL F FR R BR B BL L DFL DF DFR DR DBR DB DBL 
 dup
 turn F L
 solve 2
-end
 
 

@@ -120,6 +120,12 @@ public:
     string constructCubies(Key& key) const;
     string constructFaces(Key& key) const;
 
+    //
+    // solver
+    //
+public:
+    static bool solve(const Cube& start,const Cube& target);
+
 } PACKED;
 
 inline bool operator==(const Cube& lhs,const Cube& rhs) {

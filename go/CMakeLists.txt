@@ -35,5 +35,5 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${dir}/bin")
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
-set(SOURCE_FILES main.cpp cube.cpp cube.h cube_turn.cpp base.h crc64.cpp cube_parser.cpp command.cpp command.h)
+set(SOURCE_FILES main.cpp cube.cpp cube.h cube_turn.cpp base.h crc64.cpp cube_parser.cpp command.cpp command.h env.cpp env.h cube_solver.cpp.cpp)
 add_executable(go ${SOURCE_FILES})
