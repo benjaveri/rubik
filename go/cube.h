@@ -124,7 +124,23 @@ public:
     // solver
     //
 public:
-    static bool solve(const Cube& start,const Cube& target);
+    struct stats_t {
+        unsigned nodes;   // total number of unique nodes visited
+        unsigned *dnodes; // total number of unique nodes visited by depth
+        unsigned xphits;  // transposition table cache hits
+
+        stats_t(int depth) {
+            nodes = xphits = 0;
+            dnodes = new unsigned[depth];
+            memset(dnodes,0,sizeof(unsigned)*depth);
+        }
+        ~stats_t() {
+            delete[] dnodes;
+        }
+    };
+
+public:
+    static bool search(const Cube& start,const Cube& target,int depth,stats_t *stat);
 
 } PACKED;
 

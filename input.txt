@@ -61,9 +61,11 @@ set <parameter> to <value>
   set cuberotation <on | off>
     enable rotation of entire cube (X, Y, Z)
 
-  set xptable <size in MB>
+  set xptable <size in entries>
     hash table size for transposition elimination - bigger is better
       but you dont want to spill to disk, so pick a number like 0.5 - 0.75 of RAM
+      each entry takes up 8 bytes
+      must be a power of two
 
   set threads <number>
     set number of parallel threads to search for solutions
@@ -81,7 +83,7 @@ reset
     xptable 1024
     threads (number of physical cores on platform)
     showduration on
-    
+
 
 example program:
 

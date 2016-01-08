@@ -167,10 +167,22 @@ struct Set : public Command {
             env.showDuration = match(term,2,"on");
         } else if (match(term,1,"xptable")) {
             stringstream ss(term[2]);
-            ss >> env.xpTable;
+            unsigned i;
+            ss >> i;
+            if ((i == 0) || (i & (i-1))) {
+                cout << "Invalid table size - must be a non-zero power of two\n";
+                return Status::Failed;
+            }
+            env.xpTable = i;
         } else if (match(term,1,"threads")) {
             stringstream ss(term[2]);
-            ss >> env.threads;
+            unsigned i;
+            ss >> i;
+            if (i <= 1) {
+                cout << "Invalid thread count - must be a non-zero number\n";
+                return Status::Failed;
+            }
+            env.threads = i;
         } else {
             cout << "Unknown setting\n";
             return Status::Failed;
@@ -189,6 +201,11 @@ struct Solve : public Command {
         if (!match(term,0,"solve")) return Status::NoMatch;
         if (!ensure(2)) return Status::Failed;
 
+        // get search depth
+        stringstream ss(term[1]);
+        unsigned depth;
+        ss >> depth;
+
         // get start and finish cubes off stack
         Element st0,st1;
         st0 = cstack.top(); cstack.pop();
@@ -197,8 +214,9 @@ struct Solve : public Command {
         cstack.push(st0);
 
         // solve
+        Cube::stats_t stat(depth);
         auto t0 = chrono::steady_clock::now();
-        bool rv = Cube::solve(st0.cube,st1.cube);
+        bool rv = Cube::search(st0.cube,st1.cube,depth,&stat);
         auto t1 = chrono::steady_clock::now();
         if (env.showDuration) {
             cout << "Elapsed time: " << chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count() << "ms\n";

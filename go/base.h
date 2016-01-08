@@ -42,6 +42,7 @@
 #include <sstream>
 #include <thread>
 #include <chrono>
+#include <atomic>
 
 using namespace std;
 

@@ -33,7 +33,7 @@
 
 struct Environment {
     bool halfTurn, medianTurn, wideTurn, cubeRotation, showDuration;
-    int xpTable,threads;
+    unsigned xpTable,threads;
 
     Environment() { reset(); }
 
