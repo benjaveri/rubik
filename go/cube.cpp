@@ -28,7 +28,7 @@
  */
 #include "cube.h"
 
-qword Cube::computeHash() const {
+qword Cube::state_t::computeHash() const {
     // from crc64.cpp
     uint64_t crc64(uint64_t crc, const unsigned char *s, uint64_t l);
 

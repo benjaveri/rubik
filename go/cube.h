@@ -62,22 +62,40 @@ class Cube {
     //
 public:
     static const char *lutTurnName[(int)Turn::TOTAL];
-    static map<string,Turn> lutTurnMap;
+    static map<string,Turn> lutTurnNameMap;
 //    static map<string,Face> faceMap;
 //    static map<string,Cubie> cubieMap;
 
     inline static string lookupTurn(Turn t) { return string(lutTurnName[(int)t]); }
-    inline static Turn lookupTurn(string s) { auto it = lutTurnMap.find(s); return (it == lutTurnMap.end()) ? Turn::NONE : it->second; }
+    inline static Turn lookupTurn(string s) { auto it = lutTurnNameMap.find(s); return (it == lutTurnNameMap.end()) ? Turn::NONE : it->second; }
 
     //
     // state
     //
 public:
-    byte face[6];   // U F R B L D each 4 bits
-    byte edge[12];  // UF UR UB UL FL FR RB BL DF DR DB DL each 4:4 bits
-    word corner[8]; // UFL UFR UBR UBL DFL DFR DBR DBL each 4:4:4 bits
+    struct state_t {        // bits/cubie  count  total bytes
+        dword face;         //     3         6     18    3.5
+        qword edge;         //    1:4       12     60    7.5
+        byte corner[5];     //    2:3        8     40     5
 
-    qword computeHash() const;
+        inline void setFace(int idx,int pos) { idx *= 3; face = (face & ~(7 << idx)) | (pos << idx); }
+        inline void setEdge(int idx,int pop) { idx *= 5; edge = (edge & ~(31 << idx)) | (pop << idx); }
+        inline void setCorner(int idx,int pop) { qword& c = *(qword*)corner; idx *= 5; c = (c & ~(31 << idx)) | (pop << idx); }
+
+        inline int getFace(int idx) const { idx *= 3; return (face >> idx) & 7; }
+        inline int getEdge(int idx) const { idx *= 5; return (int)((edge >> idx) & 31); }
+        inline int getCorner(int idx) const { qword& c = *(qword*)corner; idx *= 5; return (int)((c >> idx) & 31); }
+
+        // densly pack corner state for use in table lookups
+        inline qword getCornerCompactIndex() const {
+            qword idx = 0UL;
+            for (int i = 0; i < 8; i++) idx = (idx*24) + getCorner(i);
+            return idx;
+        }
+
+        // compute hash for transposition table lookups
+        qword computeHash() const;
+    } PACKED state;
 
     //
     // turns (cube_turn.cpp)
@@ -88,9 +106,9 @@ private:
 
 private:
     struct Twist {
-        byte faceShuffle[6];    // 0:4 bits rotate:shuffle
-        byte edgeShuffle[12];   // 1:4 bits rotate:shuffle
-        byte cornerShuffle[8];  // 2:4 bits rotate:shuffle
+        byte faceShuffle[6*3];
+        byte cornerShuffle[8*3];
+        byte edgeShuffle[12*1];
     } PACKED;
 
     static Twist lutTwist[(int)Turn::TOTAL];

@@ -238,8 +238,8 @@ struct Twist : public Command {
         Cube& cube = cstack.top().cube;
         for (auto it = ++term.begin(); it != term.end(); it++) {
             // find turn to apply
-            auto t = Cube::lutTurnMap.find(*it);
-            if (t == Cube::lutTurnMap.end()) {
+            auto t = Cube::lutTurnNameMap.find(*it);
+            if (t == Cube::lutTurnNameMap.end()) {
                 cout << "Invalid turn (" << *it << ")\n";
                 return Status::Failed;
             }

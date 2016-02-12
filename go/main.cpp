@@ -32,6 +32,7 @@
 int main(int argc,const char *argv[]) {
     // init
     Cube::generateTables();
+    return 0;
 
     // for all text files...
     for (int c = 1; c < argc; c++) {

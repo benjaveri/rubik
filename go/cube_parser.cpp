@@ -149,46 +149,47 @@ bool Cube::parseKey(const string& def,Key& key) {
  *   the parseKey method that tries to make a decent map upfront
  */
 int Cube::parseCubies(const string& def,Key& key) {
-    // split into separate cubies
-    istringstream iss(def);
-    vector<string> cubie{istream_iterator<string>{iss},istream_iterator<string>{}};
-    if (cubie.size() != 26) return (int)cubie.size();
-
-    // parse and insert
-    for (int i = 0; i < 26; i++) {
-        // parse cubie
-        string& c = cubie[i];
-        unsigned acc = 0;
-        for (auto ch = c.begin(); ch != c.end(); ch++) {
-            auto it = key.find(*ch);
-            assert (it != key.end());
-            acc = (acc << 4) | it->second;
-        }
-
-        // place in state structure
-        const int *pgm = lutCubieMap[i];
-        switch (pgm[0]) {
-            case 0: {
-                if (c.length() != 1) return i;
-                face[pgm[1]] = (byte)acc;
-                break;
-            }
-            case 1: {
-                if (c.length() != 2) return i;
-                edge[pgm[1]] = (byte)acc;
-                break;
-            }
-            case 2: {
-                if (c.length() != 3) return i;
-                corner[pgm[1]] = (word)acc;
-                break;
-            }
-            default: return i;
-        }
-    }
-
-    // success
-    return -1;
+    return 0;
+//    // split into separate cubies
+//    istringstream iss(def);
+//    vector<string> cubie{istream_iterator<string>{iss},istream_iterator<string>{}};
+//    if (cubie.size() != 26) return (int)cubie.size();
+//
+//    // parse and insert
+//    for (int i = 0; i < 26; i++) {
+//        // parse cubie
+//        string& c = cubie[i];
+//        unsigned acc = 0;
+//        for (auto ch = c.begin(); ch != c.end(); ch++) {
+//            auto it = key.find(*ch);
+//            assert (it != key.end());
+//            acc = (acc << 4) | it->second;
+//        }
+//
+//        // place in state structure
+//        const int *pgm = lutCubieMap[i];
+//        switch (pgm[0]) {
+//            case 0: {
+//                if (c.length() != 1) return i;
+//                face[pgm[1]] = (byte)acc;
+//                break;
+//            }
+//            case 1: {
+//                if (c.length() != 2) return i;
+//                edge[pgm[1]] = (byte)acc;
+//                break;
+//            }
+//            case 2: {
+//                if (c.length() != 3) return i;
+//                corner[pgm[1]] = (word)acc;
+//                break;
+//            }
+//            default: return i;
+//        }
+//    }
+//
+//    // success
+//    return -1;
 }
 
 /*
@@ -198,105 +199,108 @@ int Cube::parseCubies(const string& def,Key& key) {
  *   the parseKey method that tries to make a decent map upfront
  */
 int Cube::parseFaces(const string& def,Key& key) {
-    // split into separate cubies
-    istringstream iss(def);
-    vector<string> fd{istream_iterator<string>{iss},istream_iterator<string>{}};
-    if (fd.size() != 6) return (int) fd.size();
-
-    // parse and insert
-    memset(this,0,sizeof(*this)); // zero out state since we place keys with logical or
-    for (int f = 0; f < 6; f++ ) {
-        for (int i = 0; i < 3*3; i++) {
-            // parse face
-            const char ch = fd[f][i];
-            auto it = key.find(ch);
-            assert (it != key.end());
-
-            // place in state structure
-            const int *pgm = lutFaceMap[f*9+i];
-            switch (pgm[0]) {
-                case 0: {
-                    face[pgm[1]] |= (byte)(it->second << pgm[2]);
-                    break;
-                }
-                case 1: {
-                    edge[pgm[1]] |= (byte)(it->second << pgm[2]);
-                    break;
-                }
-                case 2: {
-                    corner[pgm[1]] |= (word)(it->second << pgm[2]);
-                    break;
-                }
-                default:
-                    return f*9+i;
-            }
-        }
-    }
-
-    // success
-    return -1;
+    return 0;
+//    // split into separate cubies
+//    istringstream iss(def);
+//    vector<string> fd{istream_iterator<string>{iss},istream_iterator<string>{}};
+//    if (fd.size() != 6) return (int) fd.size();
+//
+//    // parse and insert
+//    memset(this,0,sizeof(*this)); // zero out state since we place keys with logical or
+//    for (int f = 0; f < 6; f++ ) {
+//        for (int i = 0; i < 3*3; i++) {
+//            // parse face
+//            const char ch = fd[f][i];
+//            auto it = key.find(ch);
+//            assert (it != key.end());
+//
+//            // place in state structure
+//            const int *pgm = lutFaceMap[f*9+i];
+//            switch (pgm[0]) {
+//                case 0: {
+//                    face[pgm[1]] |= (byte)(it->second << pgm[2]);
+//                    break;
+//                }
+//                case 1: {
+//                    edge[pgm[1]] |= (byte)(it->second << pgm[2]);
+//                    break;
+//                }
+//                case 2: {
+//                    corner[pgm[1]] |= (word)(it->second << pgm[2]);
+//                    break;
+//                }
+//                default:
+//                    return f*9+i;
+//            }
+//        }
+//    }
+//
+//    // success
+//    return -1;
 }
 
 /*
  * create a string representing cube state
  */
 string Cube::constructCubies(Key& key) const {
-    map<byte,char> rkey;
-    for (auto it = key.begin(); it != key.end(); it++) rkey[it->second] = it->first;
-
-    string s;
-    for (int i = 0; i < 26; i++) {
-        if (i) s.push_back(' ');
-        int ctype = lutCubieMap[i][0];
-        int index = lutCubieMap[i][1];
-        switch (ctype) {
-            case 0: {
-                s.push_back(rkey.find(face[index])->second);
-                break;
-            }
-            case 1: {
-                s.push_back(rkey.find((edge[index] >> 4) & 15)->second);
-                s.push_back(rkey.find((edge[index] >> 0) & 15)->second);
-                break;
-            }
-            case 2: {
-                s.push_back(rkey.find((corner[index] >> 8) & 15)->second);
-                s.push_back(rkey.find((corner[index] >> 4) & 15)->second);
-                s.push_back(rkey.find((corner[index] >> 0) & 15)->second);
-                break;
-            }
-        }
-    }
-    return s;
+    return "junk";
+//    map<byte,char> rkey;
+//    for (auto it = key.begin(); it != key.end(); it++) rkey[it->second] = it->first;
+//
+//    string s;
+//    for (int i = 0; i < 26; i++) {
+//        if (i) s.push_back(' ');
+//        int ctype = lutCubieMap[i][0];
+//        int index = lutCubieMap[i][1];
+//        switch (ctype) {
+//            case 0: {
+//                s.push_back(rkey.find(face[index])->second);
+//                break;
+//            }
+//            case 1: {
+//                s.push_back(rkey.find((edge[index] >> 4) & 15)->second);
+//                s.push_back(rkey.find((edge[index] >> 0) & 15)->second);
+//                break;
+//            }
+//            case 2: {
+//                s.push_back(rkey.find((corner[index] >> 8) & 15)->second);
+//                s.push_back(rkey.find((corner[index] >> 4) & 15)->second);
+//                s.push_back(rkey.find((corner[index] >> 0) & 15)->second);
+//                break;
+//            }
+//        }
+//    }
+//    return s;
 }
 
 string Cube::constructFaces(Key& key) const {
-    map<byte,char> rkey;
-    for (auto it = key.begin(); it != key.end(); it++) rkey[it->second] = it->first;
-
-    string s;
-    for (int f = 0; f < 6; f++) {
-        if (f) s.push_back(' ');
-        for (int i = 0; i < 3 * 3; i++) {
-            const int *pgm = lutFaceMap[f * 9 + i];
-            int ctype = pgm[0];
-            int index = pgm[1];
-            int shift = pgm[2];
-            switch (ctype) {
-                case 0: {
-                    s.push_back(rkey.find((face[index] >> shift) & 15)->second);
-                    break;
-                }
-                case 1: {
-                    s.push_back(rkey.find((edge[index] >> shift) & 15)->second);
-                    break;
-                }
-                case 2: {
-                    s.push_back(rkey.find((corner[index] >> shift) & 15)->second);
-                    break;
-                }
-            }
-        }
-    }
-    return s;
+    return "junk";
+//    map<byte,char> rkey;
+//    for (auto it = key.begin(); it != key.end(); it++) rkey[it->second] = it->first;
+//
+//    string s;
+//    for (int f = 0; f < 6; f++) {
+//        if (f) s.push_back(' ');
+//        for (int i = 0; i < 3 * 3; i++) {
+//            const int *pgm = lutFaceMap[f * 9 + i];
+//            int ctype = pgm[0];
+//            int index = pgm[1];
+//            int shift = pgm[2];
+//            switch (ctype) {
+//                case 0: {
+//                    s.push_back(rkey.find((face[index] >> shift) & 15)->second);
+//                    break;
+//                }
+//                case 1: {
+//                    s.push_back(rkey.find((edge[index] >> shift) & 15)->second);
+//                    break;
+//                }
+//                case 2: {
+//                    s.push_back(rkey.find((corner[index] >> shift) & 15)->second);
+//                    break;
+//                }
+//            }
+//        }
+//    }
+//    return s;
 }

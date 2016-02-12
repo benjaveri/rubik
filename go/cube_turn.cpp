@@ -39,7 +39,7 @@ const char *Cube::lutTurnName[(int)Turn::TOTAL] = {
     "Fw", "Fw2", "Fw'", "Bw", "Bw2", "Bw'",
 };
 
-map<string,Turn> Cube::lutTurnMap;
+map<string,Turn> Cube::lutTurnNameMap;
 
 /*
     U
@@ -128,115 +128,163 @@ word Cube::cornerRotation(word org,int rot) {
 }
 
 void Cube::computeTwist(const Cube& r,const Cube& c,Cube::Twist &t) {
-    // determine face shuffle
-    for (int f = 0; f < 6; f++) {
-        bool found = false;
-        for (int g = 0; g < 6; g++) {
-            if (c.face[f] == r.face[g]) {
-                t.faceShuffle[f] = (byte)g;
-                found = true;
-                break;
-            }
-        }
-        assert(found);
-    }
-
-    // determine edge shuffle
-    for (int f = 0; f < 12; f++) {
-        bool found = false;
-        for (int g = 0; g < 12*2; g++) {
-            if (c.edge[f] ==  edgeRotation(r.edge[g % 12],g/12)) {
-                t.edgeShuffle[f] = (byte)(((g/12) << 4) | (g % 12));
-                found = true;
-                break;
-            }
-        }
-        assert(found);
-    }
-
-    // determine corner shuffle
-    for (int f = 0; f < 8; f++) {
-        bool found = false;
-        for (int g = 0; g < 8*6; g++) {
-            if (c.corner[f] ==  cornerRotation(r.corner[g & 7],g >> 3)) {
-                t.cornerShuffle[f] = (byte)g;
-                found = true;
-                break;
-            }
-        }
-        assert(found);
-    }
+    assert(false);
+//    // determine face shuffle
+//    for (int f = 0; f < 6; f++) {
+//        bool found = false;
+//        for (int g = 0; g < 6; g++) {
+//            if (c.face[f] == r.face[g]) {
+//                t.faceShuffle[f] = (byte)g;
+//                found = true;
+//                break;
+//            }
+//        }
+//        assert(found);
+//    }
+//
+//    // determine edge shuffle
+//    for (int f = 0; f < 12; f++) {
+//        bool found = false;
+//        for (int g = 0; g < 12*2; g++) {
+//            if (c.edge[f] ==  edgeRotation(r.edge[g % 12],g/12)) {
+//                t.edgeShuffle[f] = (byte)(((g/12) << 4) | (g % 12));
+//                found = true;
+//                break;
+//            }
+//        }
+//        assert(found);
+//    }
+//
+//    // determine corner shuffle
+//    for (int f = 0; f < 8; f++) {
+//        bool found = false;
+//        for (int g = 0; g < 8*6; g++) {
+//            if (c.corner[f] ==  cornerRotation(r.corner[g & 7],g >> 3)) {
+//                t.cornerShuffle[f] = (byte)g;
+//                found = true;
+//                break;
+//            }
+//        }
+//        assert(found);
+//    }
 }
 
+
+inline int encodeFace(Face a) { return (int) a; }
+inline int encodeEdge(Face a,Face b) { return ((int)a)+6*((int)b); }
+inline int encodeCorner(Face a,Face b,Face c) { return ((int)a)+6*((int)b)+36*((int)c); }
+
+const int cornerCubieID[8] = {
+    encodeCorner(Face::U,Face::L,Face::F),
+    encodeCorner(Face::U,Face::F,Face::R),
+    encodeCorner(Face::U,Face::R,Face::B),
+    encodeCorner(Face::U,Face::B,Face::L),
+    encodeCorner(Face::D,Face::F,Face::L),
+    encodeCorner(Face::D,Face::R,Face::F),
+    encodeCorner(Face::D,Face::B,Face::R),
+    encodeCorner(Face::D,Face::L,Face::B),
+};
+
+const int cornerCubieVec[8][3] = {
+    { 0,2,1 },
+    { 0,1,2 },
+    { 0,2,1 },
+    { 0,1,2 },
+    { 0,2,1 },
+    { 0,1,2 },
+    { 0,2,1 },
+    { 0,1,2 }
+};
+
 void Cube::generateTables() {
-    // initialize turn map
-    for (int i = 0; i < (int)Turn::TOTAL; i++) lutTurnMap[string(lutTurnName[i])] = (Turn)i;
+    // initialize turn name lut
+    for (int i = 0; i < (int)Turn::TOTAL; i++) lutTurnNameMap[string(lutTurnName[i])] = (Turn)i;
 
-    // parse seed cubes
-    Cube seedCube[5];
-    Key key;
-    for (int i = 0; i < 5; i++) parseKey(lutSeedCube[i],key);
-    for (int i = 0; i < 5; i++) seedCube[i].parseFaces(lutSeedCube[i],key);
+    // compute tables for looking up cubie position and orientation used for printing and parsing
+    for (int org = 0; org < 8; org++) {
+        int oid = cornerCubieID[org];
+        const int *ovc = cornerCubieVec[org];
+        for (int cur = 0; cur < 8; cur++) {
+            const int *cvc = cornerCubieVec[org];
 
-    // use deltas between ref and seed to determine twist algorithm for initial turns
-    const Turn turn[] = { Turn::NONE, Turn::U, Turn::E, Turn::X, Turn::Y };
-    const Cube& r = seedCube[0];
-    for (int i = 1; i < 5; i++) {
-        // operate on these elements
-        const Cube& c = seedCube[i];
-        Twist & t = lutTwist[(int)turn[i]];
+            // ori == 0
+            table[0*8+cur] = oid;
 
-        // determine shuffle
-        computeTwist(r,c,t);
+            // ori = 1
+            table[1*8+cur] = ?
 
-        // validate correctness
-        Cube temp;
-        r.apply(turn[i],temp);
-        assert (c == temp);
-    }
-
-    // now compose remaining turns based on table definitions
-    for (const char **combo = lutTurnDef; *combo; combo++) {
-        // parse combination
-        string s = string(*combo);
-        string st = s.substr(0,s.find("->"));
-        istringstream iss(s.substr(st.size()+2));
-        vector<string> sd{istream_iterator<string>{iss},istream_iterator<string>{}};
-
-        Turn td = lookupTurn(st);
-        assert(td != Turn::NONE);
-
-        // operate on these elements
-        Cube c = r;
-
-        // rotate per definition
-        for (auto it = sd.begin(); it != sd.end(); it++) {
-            Turn t = lookupTurn(*it);
-            assert(t != Turn::NONE);
-            Cube d = c;
-            d.apply(t,c);
+            // ori = 2
+            table[2*8+cur] = ?
+            }
         }
-
-        // determine shuffle
-        computeTwist(r,c,lutTwist[(int) td]);
-
-        // validate correctness
-        Cube temp;
-        r.apply(td,temp);
-        assert (c == temp);
     }
+
+//    // parse seed cubes
+//    Cube seedCube[5];
+//    Key key;
+//    for (int i = 0; i < 5; i++) parseKey(lutSeedCube[i],key);
+//    for (int i = 0; i < 5; i++) seedCube[i].parseFaces(lutSeedCube[i],key);
+//
+//    // use deltas between ref and seed to determine twist algorithm for initial turns
+//    const Turn turn[] = { Turn::NONE, Turn::U, Turn::E, Turn::X, Turn::Y };
+//    const Cube& r = seedCube[0];
+//    for (int i = 1; i < 5; i++) {
+//        // operate on these elements
+//        const Cube& c = seedCube[i];
+//        Twist & t = lutTwist[(int)turn[i]];
+//
+//        // determine shuffle
+//        computeTwist(r,c,t);
+//
+//        // validate correctness
+//        Cube temp;
+//        r.apply(turn[i],temp);
+//        assert (c == temp);
+//    }
+//
+//    // now compose remaining turns based on table definitions
+//    for (const char **combo = lutTurnDef; *combo; combo++) {
+//        // parse combination
+//        string s = string(*combo);
+//        string st = s.substr(0,s.find("->"));
+//        istringstream iss(s.substr(st.size()+2));
+//        vector<string> sd{istream_iterator<string>{iss},istream_iterator<string>{}};
+//
+//        Turn td = lookupTurn(st);
+//        assert(td != Turn::NONE);
+//
+//        // operate on these elements
+//        Cube c = r;
+//
+//        // rotate per definition
+//        for (auto it = sd.begin(); it != sd.end(); it++) {
+//            Turn t = lookupTurn(*it);
+//            assert(t != Turn::NONE);
+//            Cube d = c;
+//            d.apply(t,c);
+//        }
+//
+//        // determine shuffle
+//        computeTwist(r,c,lutTwist[(int) td]);
+//
+//        // validate correctness
+//        Cube temp;
+//        r.apply(td,temp);
+//        assert (c == temp);
+//    }
 }
 
 void Cube::apply(Turn turn,Cube& dest) const {
-    Twist & t = lutTwist[(int)turn];
-
-    // faces
-    for (int i = 0; i < 6; i++) dest.face[i] = face[t.faceShuffle[i]];
-
-    // edges
-    for (int i = 0; i < 12; i++) dest.edge[i] = edgeRotation(edge[t.edgeShuffle[i] & 15],t.edgeShuffle[i] >> 4);
-
-    // corners
-    for (int i = 0; i < 8; i++) dest.corner[i] = cornerRotation(corner[t.cornerShuffle[i] & 7],t.cornerShuffle[i] >> 3);
+    assert(false);
+//    Twist & t = lutTwist[(int)turn];
+//
+//    // faces
+//    for (int i = 0; i < 6; i++) dest.face[i] = face[t.faceShuffle[i]];
+//
+//    // edges
+//    for (int i = 0; i < 12; i++) dest.edge[i] = edgeRotation(edge[t.edgeShuffle[i] & 15],t.edgeShuffle[i] >> 4);
+//
+//    // corners
+//    for (int i = 0; i < 8; i++) dest.corner[i] = cornerRotation(corner[t.cornerShuffle[i] & 7],t.cornerShuffle[i] >> 3);
 }
 

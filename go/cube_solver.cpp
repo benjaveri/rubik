@@ -105,7 +105,7 @@ bool Cube::search(const Cube& start,const Cube& target,int depth,stats_t *stat) 
     ss.pool = new Worker[env.threads];
 
     // set up target
-    ss.target = target.computeHash();
+    ss.target = target.state.computeHash();
 
     // place source in xp
 
